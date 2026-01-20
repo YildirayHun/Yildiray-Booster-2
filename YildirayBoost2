@@ -1,0 +1,79 @@
+local function autoLoadBooster2()
+    local speedEnabled = false
+    local currentSpeed = 50
+
+    local MainB = Instance.new("Frame")
+    MainB.Name = "BoosterMain"
+    MainB.Size = UDim2.new(0, 180, 0, 100)
+    MainB.Position = UDim2.new(0.05, 0, 0.4, 0)
+    MainB.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    MainB.BorderSizePixel = 0
+    MainB.Parent = ScreenGui
+    Instance.new("UICorner", MainB).CornerRadius = UDim.new(0, 12)
+    local UIStroke = Instance.new("UIStroke", MainB)
+    UIStroke.Color = Color3.fromRGB(255, 215, 0)
+    UIStroke.Thickness = 2
+    makeDraggable(MainB)
+
+    local BTitle = Instance.new("TextLabel")
+    BTitle.Size = UDim2.new(1, 0, 0, 35)
+    BTitle.BackgroundTransparency = 1
+    BTitle.Text = "YildirayBooster 2 ⚡"
+    BTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
+    BTitle.TextSize = 16
+    BTitle.Font = Enum.Font.GothamBold
+    BTitle.Parent = MainB
+
+    local SpeedBox = Instance.new("TextBox")
+    SpeedBox.Size = UDim2.new(0, 140, 0, 25)
+    SpeedBox.Position = UDim2.new(0.5, -70, 0, 40)
+    SpeedBox.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+    SpeedBox.Text = tostring(currentSpeed)
+    SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SpeedBox.PlaceholderText = "Hız..."
+    SpeedBox.Font = Enum.Font.Gotham
+    SpeedBox.Parent = MainB
+    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 6)
+
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Size = UDim2.new(1, 0, 0, 25)
+    StatusLabel.Position = UDim2.new(0, 0, 1, -30)
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.Text = "DURUM: KAPALI (Q)"
+    StatusLabel.TextColor3 = Color3.fromRGB(200, 80, 80)
+    StatusLabel.TextSize = 13
+    StatusLabel.Font = Enum.Font.GothamBold
+    StatusLabel.Parent = MainB
+
+    RunService.Heartbeat:Connect(function()
+        if speedEnabled then
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+                local hrp = char.HumanoidRootPart
+                local hum = char.Humanoid
+                if hum.MoveDirection.Magnitude > 0 then
+                    hrp.AssemblyLinearVelocity = Vector3.new(
+                        hum.MoveDirection.X * currentSpeed,
+                        hrp.AssemblyLinearVelocity.Y,
+                        hum.MoveDirection.Z * currentSpeed
+                    )
+                end
+            end
+        end
+    end)
+
+    local function toggleSpeed()
+        speedEnabled = not speedEnabled
+        StatusLabel.Text = speedEnabled and "DURUM: AKTİF ✅" or "DURUM: KAPALI ❌"
+        StatusLabel.TextColor3 = speedEnabled and Color3.fromRGB(80, 200, 120) or Color3.fromRGB(200, 80, 80)
+        UIStroke.Color = speedEnabled and Color3.fromRGB(80, 200, 120) or Color3.fromRGB(255, 215, 0)
+    end
+
+    UserInputService.InputBegan:Connect(function(input, gpe)
+        if not gpe and input.KeyCode == Enum.KeyCode.Q then toggleSpeed() end
+    end)
+
+    SpeedBox:GetPropertyChangedSignal("Text"):Connect(function()
+        currentSpeed = tonumber(SpeedBox.Text) or 16
+    end)
+end
